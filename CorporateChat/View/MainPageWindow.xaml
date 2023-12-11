@@ -1,0 +1,390 @@
+﻿<Window x:Class="CorporateChat.View.MainPageWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:scripts="clr-namespace:CorporateChat.View.Scripts"
+        xmlns:vm="clr-namespace:CorporateChat.ViewModel"
+        
+        mc:Ignorable="d"
+        Title="MainPageWindow" Height="768" Width="780" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" WindowStyle="None" Icon="/View/Icons/logo.png">
+    
+    <Window.Resources>
+        <scripts:EqualityConverter x:Key="EqualityConverter"/>
+        <scripts:LastItemInContainerConverter x:Key="LastItemInContainerConverter"/>
+        <scripts:MoreThanThreeInterlocutorsVisibilityConverter x:Key="MoreThanThreeInterlocutorsVisibilityConverter"/>
+        <scripts:TopThreeInterlocutorsConverter x:Key="TopThreeInterlocutorsConverter"/>
+        <Style x:Key="FocusVisual">
+            <Setter Property="Control.Template">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <Rectangle Margin="2" StrokeDashArray="1 2" Stroke="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" SnapsToDevicePixels="true" StrokeThickness="1"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <SolidColorBrush x:Key="Button.Static.Background" Color="#FFDDDDDD"/>
+        <SolidColorBrush x:Key="Button.Static.Border" Color="#FF707070"/>
+        <SolidColorBrush x:Key="Button.MouseOver.Background" Color="#FFBEE6FD"/>
+        <SolidColorBrush x:Key="Button.MouseOver.Border" Color="#FF3C7FB1"/>
+        <SolidColorBrush x:Key="Button.Pressed.Background" Color="#FFC4E5F6"/>
+        <SolidColorBrush x:Key="Button.Pressed.Border" Color="#FF2C628B"/>
+        <SolidColorBrush x:Key="Button.Disabled.Background" Color="#FFF4F4F4"/>
+        <SolidColorBrush x:Key="Button.Disabled.Border" Color="#FFADB2B5"/>
+        <SolidColorBrush x:Key="Button.Disabled.Foreground" Color="#FF838383"/>
+        <Style x:Key="RoundedButtonKey" TargetType="{x:Type Button}">
+            <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisual}"/>
+            <Setter Property="Background" Value="{StaticResource Button.Static.Background}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource Button.Static.Border}"/>
+            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Padding" Value="1"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border x:Name="border" CornerRadius="11" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" SnapsToDevicePixels="true">
+                            <ContentPresenter x:Name="contentPresenter" Focusable="False" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsDefaulted" Value="true">
+                                <Setter Property="BorderBrush" TargetName="border" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="true">
+                                <Setter Property="Background" TargetName="border" Value="#746FAE"/>
+                                <Setter Property="BorderBrush" TargetName="border" Value="#746FAE"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="true">
+                                <Setter Property="Background" TargetName="border" Value="#8D89B5"/>
+                                <Setter Property="BorderBrush" TargetName="border" Value="#8D89B5"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter Property="Background" TargetName="border" Value="{StaticResource Button.Disabled.Background}"/>
+                                <Setter Property="BorderBrush" TargetName="border" Value="{StaticResource Button.Disabled.Border}"/>
+                                <Setter Property="TextElement.Foreground" TargetName="contentPresenter" Value="{StaticResource Button.Disabled.Foreground}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+    
+    <Grid Height="768" Width="780" Background= "#B89C99">
+        
+        <Grid.RowDefinitions>
+            <RowDefinition Height="20"/>
+            <RowDefinition Height="748"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="250"/>
+            <ColumnDefinition Width="530"/>
+        </Grid.ColumnDefinitions>
+        
+        <!--информация о чате-->      
+        <StackPanel Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" Orientation="Vertical">
+
+            <TextBlock Text="{Binding currentChat.Name}" Padding="30 0 0 0" Foreground="White" FontSize="24"  Background="#655FA6">
+                <TextBlock.InputBindings>
+                    <MouseBinding MouseAction="LeftClick" Command="{Binding ShowChatInfoCommand}"/>
+                </TextBlock.InputBindings>
+            </TextBlock>
+            <!--<TextBlock Text="Участники: Тимур Закиров, Алексей Коннов, Ксения Щербакова" Padding="15 0 0 0" Foreground="White" Background="#655FA6"/>-->
+            <!--<ItemsControl ItemsSource="{Binding currentChat.Interlocutors, Converter={StaticResource TopThreeInterlocutorsConverter}}" Background="#655FA6" Padding="15 0 0 0">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding Name}" Foreground="White" />
+                            <TextBlock Text=" " Foreground="White" />
+                            <TextBlock Text="{Binding Surname}" Foreground="White" />
+                            <TextBlock Text=", " Foreground="White" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemContainerStyle>
+                    <Style TargetType="ContentPresenter">
+                        <Setter Property="Margin" Value="15 0 0 0" />
+                        
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ItemsControl}, Path=Items.Count}" Value="1">
+                                <Setter Property="Margin" Value="0 0 0 0" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContentPresenter}, Path=ContentControl.Content, Converter={StaticResource LastItemInContainerConverter}}" Value="True">
+                                <Setter Property="TextBlock.Text">
+                                    <Setter.Value>
+                                        <MultiBinding StringFormat="{}{0} {1}">
+                                            <Binding Path="UserName" />
+                                            <Binding Path="UserSurname" />
+                                        </MultiBinding>
+                                    </Setter.Value>
+                                </Setter>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ItemsControl.ItemContainerStyle>
+            </ItemsControl>-->
+
+
+        </StackPanel>
+        <!--кнопки выхода и свернуть-->
+        <StackPanel  Orientation="Horizontal" HorizontalAlignment="Right" Grid.Row="0" Grid.Column="1">
+            
+            <Button Panel.ZIndex="1" x:Name="buttonMinimize" BorderThickness="0" Background="Transparent">
+                <Image x:Name="imageMinimize" Source="Icons/window_minimize_icon_194428.png" Height="13"></Image>
+            </Button>
+            <Button Panel.ZIndex="1" x:Name="buttonExit" BorderThickness="0" Background="Transparent">
+                <Image x:Name="imageExit" Source="Icons/close_cross_icon_128690.png"></Image>
+            </Button>
+        </StackPanel>
+        <Grid Grid.Row="0" Grid.RowSpan="2" Background="White">
+            <StackPanel Orientation="Vertical" VerticalAlignment="Top">
+                <Image Width="100" Margin="10" Source="Styles/Resources/companyLogo.png" />
+                <TextBlock HorizontalAlignment="Center" FontSize="20" Margin="0 10 0 0" Text="{Binding Name}"/>
+                <TextBlock HorizontalAlignment="Center" FontSize="20" Margin="0 0 0 10" Text="{Binding Surname}"/>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Button Command="{Binding ShowProfileCommand}" Width="110" Height="28" Margin="7" Style="{DynamicResource RoundedButtonKey}">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="Icons/user.png" Height="20" Width="20" Margin="0 2 0 0"/>
+                            <TextBlock Text="Профиль" Margin="7 2 0 0"></TextBlock>
+                        </StackPanel>
+                    </Button>
+                    <Button Command="{Binding NewChatCommand}" Width="110" Height="28" Margin="7" Style="{DynamicResource RoundedButtonKey}">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="Icons/NewChat.png" Height="20" Width="20" Margin="0 2 0 0"/>
+                            <TextBlock Text="Новый чат" Margin="7 2 0 0"></TextBlock>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+                
+                
+                <!--собеседники-->
+                <ItemsControl Height="350" ItemsSource="{Binding RadioButtons}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Vertical" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                </ItemsControl>
+                
+                <!--кто онлайн-->
+                <TextBlock Text="Сейчас в сети:" FontSize="16" Margin="10 0 0 0"/>
+                <ListBox ItemsSource="{Binding Users}">
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
+                            <Setter Property="BorderThickness" Value="0"/>
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate>
+                                        <Border BorderThickness="0">
+                                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                                                <Ellipse Fill="Green" Width="7" Height="7" Margin="10 0 5 0"/>
+                                                <TextBlock FontWeight="Bold" Margin="0 0 0 5" FontSize="15">
+                                                    <TextBlock.Text>
+                                                        <MultiBinding StringFormat="{}{0} {1}">
+                                                            <Binding Path="Name" />
+                                                            <Binding Path="Surname" />
+                                                        </MultiBinding>
+                                                    </TextBlock.Text>
+                                                </TextBlock>
+                                                <!--<TextBlock Text="{Binding Name}" FontSize="15"/>-->                                                
+                                            </StackPanel>
+                                        </Border>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+                </ListBox>
+                <!--<ListView ItemsSource="{Binding Users}">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Username}"/>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>-->
+            </StackPanel>
+        </Grid>
+        <Grid  Grid.Row="1" Grid.Column="1">
+            <StackPanel Orientation="Vertical" VerticalAlignment="Bottom">
+                <!--вывод сообщений-->
+                <ListBox BorderThickness="0" x:Name="chatListBox"
+                     VerticalContentAlignment="Bottom"
+                     Height="663"
+                     Background="Transparent"
+                     ItemsSource="{Binding ChatMessages}"
+                     
+                     SelectionMode="Single"
+                     ScrollViewer.CanContentScroll="True"
+                     ScrollViewer.VerticalScrollBarVisibility="Auto">   
+                    <ListBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <VirtualizingStackPanel VerticalAlignment="Bottom" />
+                        </ItemsPanelTemplate>
+                    </ListBox.ItemsPanel>
+
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
+                            <Setter Property="HorizontalAlignment" Value="Left"/>
+                            <Setter Property="Margin" Value="10"></Setter>
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate>
+                                        <Border  Background="White" CornerRadius="0 11 11 11">
+                                            <StackPanel Margin="7">
+                                                <TextBlock FontWeight="Bold" Margin="0 0 0 5" >
+                                                    <TextBlock.Text>
+                                                        <MultiBinding StringFormat="{}{0} {1}">
+                                                            <Binding Path="UserName" />
+                                                            <Binding Path="UserSurname" />
+                                                        </MultiBinding>
+                                                    </TextBlock.Text>
+                                                </TextBlock>
+                                                <TextBlock Text="{Binding MessageText}" />
+                                                <TextBlock FontSize="10" Margin="0 0 0 5" HorizontalAlignment="Right">
+                                                    <TextBlock.Text>
+                                                        <Binding Path="timeCreated" StringFormat="{}{0:HH:mm}" />
+                                                    </TextBlock.Text>
+                                                </TextBlock>
+                                            </StackPanel>
+                                        </Border>
+                                    </ControlTemplate>
+
+                                </Setter.Value>
+                            </Setter>
+                            <!--изменение стиля для сообщений-->
+                            <Style.Triggers>
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Value="True">
+                                            <Condition.Binding>
+                                                <MultiBinding Converter="{StaticResource EqualityConverter}">
+                                                    <Binding Path="UserId"/>
+                                                    <Binding Path="DataContext.UID"  RelativeSource="{RelativeSource AncestorType=ListBox}"/>
+                                                </MultiBinding>
+                                            </Condition.Binding>
+                                        </Condition>
+                                    </MultiDataTrigger.Conditions>                                    
+                                    <Setter Property="Foreground" Value="White"/>
+                                    <Setter Property="HorizontalAlignment" Value="Right"/>
+                                    <Setter Property="Margin" Value="10"></Setter>
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate>
+                                                <Border Background="#655FA6" CornerRadius="11 0 11 11">
+                                                    <StackPanel Margin="7">
+                                                        <!--<TextBlock Text="{Binding UserName}" FontWeight="Bold" Margin="0 0 0 5"/>
+                                                        <TextBlock Text="{Binding MessageText}" />-->
+                                                        <TextBlock FontWeight="Bold" Margin="0 0 0 5" >
+                                                            <TextBlock.Text>
+                                                                <MultiBinding StringFormat="{}{0} {1}">
+                                                                    <Binding Path="UserName" />
+                                                                    <Binding Path="UserSurname" />
+                                                                </MultiBinding>
+                                                            </TextBlock.Text>
+                                                        </TextBlock>
+                                                        <TextBlock Text="{Binding MessageText}" />
+                                                        <TextBlock FontSize="10" Margin="0 0 0 5" HorizontalAlignment="Right">
+                                                            <TextBlock.Text>
+                                                                <Binding Path="timeCreated" StringFormat="{}{0:HH:mm}" />
+                                                            </TextBlock.Text>
+                                                        </TextBlock>
+                                                    </StackPanel>
+                                                </Border>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </MultiDataTrigger>
+                                <!--бомба-->
+
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Value="True">
+                                            <Condition.Binding>
+                                                <MultiBinding Converter="{StaticResource EqualityConverter}">
+                                                    <Binding Path="isDestroyMessage"/>
+                                                    <Binding Path="DataContext.IsTrue"  RelativeSource="{RelativeSource AncestorType=ListBox}"/>
+                                                </MultiBinding>
+                                            </Condition.Binding>
+                                        </Condition>
+                                    </MultiDataTrigger.Conditions>
+                                    <Setter Property="Foreground" Value="Black"/>
+                                    <Setter Property="HorizontalAlignment" Value="Right"/>
+                                    <Setter Property="Margin" Value="10"></Setter>
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate>
+                                                <Border Background="#B97272" CornerRadius="11 11 11 11">
+                                                    <StackPanel Margin="7">
+                                                        <!--<TextBlock Text="{Binding UserName}" FontWeight="Bold" Margin="0 0 0 5"/>
+                                                        <TextBlock Text="{Binding MessageText}" />-->
+                                                        <TextBlock FontWeight="Bold" Margin="0 0 0 5" >
+                                                            <TextBlock.Text>
+                                                                <MultiBinding StringFormat="{}{0} {1}">
+                                                                    <Binding Path="UserName" />
+                                                                    <Binding Path="UserSurname" />                                                                    
+                                                                </MultiBinding>
+                                                            </TextBlock.Text>
+                                                        </TextBlock>
+                                                        <TextBlock Text="{Binding MessageText}" />
+
+                                                            <!--<StackPanel Orientation="Horizontal">
+                                                                <Image Source="Icons/bomb.png" Height="14" Margin="5 0 5 5" HorizontalAlignment="Left"></Image>
+                                                                <TextBlock FontSize="10" Margin="0 0 0 5" HorizontalAlignment="Left">
+                                                                    <TextBlock.Text>
+                                                                        <Binding Path="timeToDestroy" StringFormat="{}{0:HH:mm}"/>
+                                                                    </TextBlock.Text>
+                                                                </TextBlock>                                                            
+                                                                <TextBlock FontSize="10" Margin="0 0 0 5" HorizontalAlignment="Right">
+                                                                    <TextBlock.Text>
+                                                                        <Binding Path="timeCreated" StringFormat="{}{0:HH:mm}" />
+                                                                    </TextBlock.Text>
+                                                                </TextBlock>
+                                                            </StackPanel>-->
+                                                        <DockPanel LastChildFill="False">
+                                                            <Image Source="Icons/bomb.png" Height="14" Margin="5 0 5 5" DockPanel.Dock="Left"></Image>
+                                                            <TextBlock FontSize="10" Margin="0 0 0 5" DockPanel.Dock="Left">
+                                                                <TextBlock.Text>
+                                                                    <Binding Path="timeToDestroy" StringFormat="{}{0:HH:mm}"/>
+                                                                </TextBlock.Text>
+                                                            </TextBlock>
+                                                            <TextBlock FontSize="10" Margin="0 0 0 5" DockPanel.Dock="Right">
+                                                                <TextBlock.Text>
+                                                                    <Binding Path="timeCreated" StringFormat="{}{0:HH:mm}" />
+                                                                </TextBlock.Text>
+                                                            </TextBlock>
+                                                        </DockPanel>
+
+                                                    </StackPanel>
+                                                </Border>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </MultiDataTrigger>
+                            </Style.Triggers>
+                           
+
+                        </Style>
+                        <!--бомба-->
+                        
+                    </ListBox.ItemContainerStyle>
+                </ListBox>
+                <!--ввод сообщения-->
+                <TextBox Text="{Binding message, UpdateSourceTrigger=PropertyChanged}" x:Name="messageTb" Style="{StaticResource MessageBox}" VerticalAlignment="Bottom"/>
+            </StackPanel>
+        </Grid>
+        <!--отправка самоуничтожающегося сообщения-->
+        <Button Command="{Binding SendDestroingMessageCommand}" Grid.Column="1" Grid.Row="1"  VerticalAlignment="Bottom" HorizontalAlignment="Right" Panel.ZIndex="1" Width="25" Height="25" BorderThickness="0" Background="Transparent" Margin="0 0 50 20">
+            <Image Width="25" Source="Icons/sendtimer.png"></Image>
+        </Button>
+        <!--кнопка отправки сообщения-->
+        <Button x:Name="buttonSend" Command="{Binding SendMessageCommand}" Grid.Column="1" Grid.Row="1"  VerticalAlignment="Bottom" HorizontalAlignment="Right" Panel.ZIndex="1" Width="25" Height="25" BorderThickness="0" Background="Transparent" Margin="0 0 20 20">
+                <Image Width="25" Source="Icons/send.png"></Image>
+        </Button>
+    </Grid>
+</Window>

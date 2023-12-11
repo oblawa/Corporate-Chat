@@ -1,0 +1,1 @@
+﻿INSERT INTO Users (Login, Password) VALUES (N'test2', N'12345')
