@@ -1,0 +1,16 @@
+[req]
+distinguished_name = req_distinguished_name
+x509_extensions = v3_req
+prompt = no
+
+[req_distinguished_name]
+C = RU
+ST = Tatarstan
+L = Kazan
+O = CorporateChat
+OU = CorporateChatServer
+CN = clientname
+
+[v3_req]
+keyUsage = keyEncipherment, dataEncipherment
+extendedKeyUsage = clientAuth
